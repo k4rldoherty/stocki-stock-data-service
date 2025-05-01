@@ -29,4 +29,30 @@ public class ApiService(HttpClient httpClient, IConfiguration config)
         }
         return new ApiResponse(((int)response.StatusCode), $"{DateTime.Now}", jsonDoc.RootElement.Clone());
     }
+
+    public async Task<ApiResponse> GetStockInfoAsync(string symbol)
+    {
+        var url =
+            $"https://www.alphavantage.co/query?function=OVERVIEW&symbol={symbol}&apikey={_alphaApi}";
+        var response = await httpClient.GetAsync(url);
+        if (response.StatusCode != HttpStatusCode.OK)
+            return new ApiResponse(
+                (int)response.StatusCode, 
+                "Error retrieving data for this ticker",
+                null
+            );
+        var responseStr = await response.Content.ReadAsStringAsync();
+        var jsonDoc = JsonDocument.Parse(responseStr);
+        if (jsonDoc.RootElement.TryGetProperty("Information", out _))
+            return new ApiResponse(
+                500,
+                "My owner is too cheap to pay for the premium API.. I'm going to sleep until tomorrow.",
+                null
+            );
+        if (!jsonDoc.RootElement.TryGetProperty("Symbol", out _))
+        {
+            return new ApiResponse((int)response.StatusCode,"Symbol not found", null);
+        }
+        return new ApiResponse((int)response.StatusCode, "Request Successful", jsonDoc.RootElement.Clone());
+    }
 }

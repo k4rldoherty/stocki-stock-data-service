@@ -15,4 +15,13 @@ public class StockDataController(ApiService stockDataService) : ControllerBase
             ? StatusCode((int)res.StatusCode, res.Message)
             : Ok(res);
     }
+
+    [HttpGet("get-stock-info/{ticker}")]
+    public async Task<IActionResult> GetStockInfoAsync(string ticker)
+    {
+        var res = await stockDataService.GetStockInfoAsync(ticker);
+        return res.Data is null
+            ? StatusCode((int)res.StatusCode, res.Message)
+            : Ok(res);
+    }
 }
