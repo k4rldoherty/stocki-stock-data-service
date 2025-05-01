@@ -7,7 +7,7 @@ namespace StockDataService.Controllers;
 [Route("api/")]
 public class StockDataController(ApiService stockDataService) : ControllerBase
 {
-    [HttpGet("get-price-data/{ticker}")]
+    [HttpGet("get-stock-price-data/{ticker}")]
     public async Task<IActionResult> GetStockPriceDataAsync(string ticker)
     {
         var res = await stockDataService.GetStockData(ticker);
