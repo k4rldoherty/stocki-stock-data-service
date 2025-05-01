@@ -1,0 +1,18 @@
+using Microsoft.AspNetCore.Mvc;
+using StockDataService.Services;
+
+namespace StockDataService.Controllers;
+
+[ApiController]
+[Route("api/")]
+public class StockDataController(ApiService stockDataService) : ControllerBase
+{
+    [HttpGet("get-price-data/{ticker}")]
+    public async Task<IActionResult> GetStockPriceDataAsync(string ticker)
+    {
+        var res = await stockDataService.GetStockData(ticker);
+        return res.Data is null
+            ? StatusCode((int)res.StatusCode, res.Message)
+            : Ok(res);
+    }
+}
