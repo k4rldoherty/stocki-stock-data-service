@@ -5,12 +5,12 @@ namespace StockDataService.Controllers;
 
 [ApiController]
 [Route("api/")]
-public class StockDataController(ApiService stockDataService) : ControllerBase
+public class StockDataController(ApiService apiService) : ControllerBase
 {
     [HttpGet("get-stock-price-data/{ticker}")]
     public async Task<IActionResult> GetStockPriceDataAsync(string ticker)
     {
-        var res = await stockDataService.GetStockData(ticker);
+        var res = await apiService.GetStockData(ticker);
         return res.Data is null
             ? StatusCode((int)res.StatusCode, res.Message)
             : Ok(res);
@@ -19,7 +19,7 @@ public class StockDataController(ApiService stockDataService) : ControllerBase
     [HttpGet("get-stock-info/{ticker}")]
     public async Task<IActionResult> GetStockInfoAsync(string ticker)
     {
-        var res = await stockDataService.GetStockInfoAsync(ticker);
+        var res = await apiService.GetStockInfoAsync(ticker);
         return res.Data is null
             ? StatusCode((int)res.StatusCode, res.Message)
             : Ok(res);
@@ -28,7 +28,16 @@ public class StockDataController(ApiService stockDataService) : ControllerBase
     [HttpGet("get-stock-news/{ticker}")]
     public async Task<IActionResult> GetStockNewsAsync(string ticker)
     {
-        var res = await stockDataService.GetStockNewsAsync(ticker);
+        var res = await apiService.GetStockNewsAsync(ticker);
+        return res.Data is null
+            ? StatusCode((int)res.StatusCode, res.Message)
+            : Ok(res);
+    }
+
+    [HttpGet("check-ticker/{ticker}")]
+    public async Task<IActionResult> CheckTickerAsync(string ticker)
+    {
+        var res = await apiService.CheckTickerAsync(ticker);
         return res.Data is null
             ? StatusCode((int)res.StatusCode, res.Message)
             : Ok(res);

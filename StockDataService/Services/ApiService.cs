@@ -93,4 +93,31 @@ public class ApiService(HttpClient httpClient, IConfiguration config, IMemoryCac
         cache.Set(url, jsonDoc.RootElement.Clone(), DateTimeOffset.Now.AddHours(3));
         return new ApiResponse((int)response.StatusCode, "Company News",jsonDoc.RootElement.Clone()); 
     }
+
+    public async Task<ApiResponse> CheckTickerAsync(string symbol)
+    {
+        symbol = symbol.ToUpper();
+        var url = $"https://finnhub.io/api/v1/stock/profile2?symbol={symbol}&token={_fhApi}";
+        if (cache.TryGetValue(url, out JsonElement? cacheEntry))
+        {
+            return new ApiResponse(200, "Retrieved from cache", cacheEntry);
+        }
+        var response = await httpClient.GetAsync(url);
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            return new ApiResponse(
+                (int)response.StatusCode,
+                $"Something went wrong retrieving the data",
+                null
+            );
+        }
+        var responseStr = await response.Content.ReadAsStringAsync();
+        if (responseStr == "{}")
+        {
+            return new ApiResponse((int)response.StatusCode,$"Ticker Symbol invalid, check input and try again", null);
+        }
+        var jsonDoc = JsonDocument.Parse(responseStr);
+        cache.Set(url, jsonDoc.RootElement.Clone(), DateTimeOffset.Now.AddDays(1));
+        return new ApiResponse((int)response.StatusCode, "Ticker is valid", jsonDoc.RootElement.Clone());
+    }
 }
