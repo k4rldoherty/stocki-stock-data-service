@@ -3,7 +3,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 
 EXPOSE 8080
-ENV ASPNETCORE_URLS=http://+:8080;https://+:8080
+EXPOSE 8081
+ENV ASPNETCORE_URLS=http://+:8080;https://+:8081;
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -11,6 +12,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 COPY ["StockDataService/StockDataService.csproj", "StockDataService/"]
+COPY ~/.https-cert /app/.https-cert
 
 # Brings in any dependencies 
 RUN dotnet restore "StockDataService/StockDataService.csproj"
