@@ -7,8 +7,12 @@ namespace StockDataService.Services;
 
 public class ApiService(HttpClient httpClient, IConfiguration config, IMemoryCache cache)
 {
-    private readonly string? _fhApi = config["FINNHUB_API_KEY"] ?? throw new NullReferenceException("Cannot retrieve Api Key");
-    private readonly string? _alphaApi = config["ALPHA_API_KEY"] ?? throw new NullReferenceException("Cannot retrieve Api Key");
+    //private readonly string? _fhApi = config["FINNHUB_API_KEY"] ?? throw new NullReferenceException("Cannot retrieve Api Key");
+    //private readonly string? _alphaApi = config["ALPHA_API_KEY"] ?? throw new NullReferenceException("Cannot retrieve Api Key");
+    private readonly string? _fhApi = Environment.GetEnvironmentVariable("FHAPI") ??
+                                      throw new NullReferenceException("Cannot retrieve fh api key");
+    private readonly string? _alphaApi = Environment.GetEnvironmentVariable("ALPHAAPI") ?? throw new NullReferenceException("Cannot retrieve alpha api key");
+    
     public async Task<ApiResponse> GetStockData(string symbol)
     {
         symbol = symbol.ToUpper();
