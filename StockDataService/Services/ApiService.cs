@@ -5,14 +5,17 @@ using StockDataService.Models;
 
 namespace StockDataService.Services;
 
-public class ApiService(HttpClient httpClient, IConfiguration config, IMemoryCache cache)
+public class ApiService(HttpClient httpClient, IMemoryCache cache)
 {
     //private readonly string? _fhApi = config["FINNHUB_API_KEY"] ?? throw new NullReferenceException("Cannot retrieve Api Key");
     //private readonly string? _alphaApi = config["ALPHA_API_KEY"] ?? throw new NullReferenceException("Cannot retrieve Api Key");
-    private readonly string? _fhApi = Environment.GetEnvironmentVariable("FHAPI") ??
-                                      throw new NullReferenceException("Cannot retrieve fh api key");
-    private readonly string? _alphaApi = Environment.GetEnvironmentVariable("ALPHAAPI") ?? throw new NullReferenceException("Cannot retrieve alpha api key");
-    
+    private readonly string? _fhApi =
+        Environment.GetEnvironmentVariable("FHAPI")
+        ?? throw new NullReferenceException("Cannot retrieve fh api key");
+    private readonly string? _alphaApi =
+        Environment.GetEnvironmentVariable("ALPHAAPI")
+        ?? throw new NullReferenceException("Cannot retrieve alpha api key");
+
     public async Task<ApiResponse> GetStockData(string symbol)
     {
         symbol = symbol.ToUpper();
@@ -23,7 +26,11 @@ public class ApiService(HttpClient httpClient, IConfiguration config, IMemoryCac
         }
         var response = await httpClient.GetAsync(url);
         if (response.StatusCode != HttpStatusCode.OK)
-            return new ApiResponse(((int)response.StatusCode), $"Error retrieving data for ticker {symbol}", null);
+            return new ApiResponse(
+                ((int)response.StatusCode),
+                $"Error retrieving data for ticker {symbol}",
+                null
+            );
         var responseStr = await response.Content.ReadAsStringAsync();
         var jsonDoc = JsonDocument.Parse(responseStr);
         if (!jsonDoc.RootElement.TryGetProperty("c", out var currPrice))
@@ -35,7 +42,11 @@ public class ApiService(HttpClient httpClient, IConfiguration config, IMemoryCac
             return new ApiResponse(404, "Cannot get stock data for this ticker", null);
         }
         cache.Set(url, jsonDoc.RootElement.Clone(), DateTimeOffset.Now.AddMinutes(5));
-        return new ApiResponse(((int)response.StatusCode), $"{DateTime.Now}", jsonDoc.RootElement.Clone());
+        return new ApiResponse(
+            ((int)response.StatusCode),
+            $"{DateTime.Now}",
+            jsonDoc.RootElement.Clone()
+        );
     }
 
     public async Task<ApiResponse> GetStockInfoAsync(string symbol)
@@ -50,7 +61,7 @@ public class ApiService(HttpClient httpClient, IConfiguration config, IMemoryCac
         var response = await httpClient.GetAsync(url);
         if (response.StatusCode != HttpStatusCode.OK)
             return new ApiResponse(
-                (int)response.StatusCode, 
+                (int)response.StatusCode,
                 "Error retrieving data for this ticker",
                 null
             );
@@ -64,10 +75,14 @@ public class ApiService(HttpClient httpClient, IConfiguration config, IMemoryCac
             );
         if (!jsonDoc.RootElement.TryGetProperty("Symbol", out _))
         {
-            return new ApiResponse((int)response.StatusCode,"Symbol not found", null);
+            return new ApiResponse((int)response.StatusCode, "Symbol not found", null);
         }
         cache.Set(url, jsonDoc.RootElement.Clone(), DateTimeOffset.Now.AddDays(1));
-        return new ApiResponse((int)response.StatusCode, "Request Successful", jsonDoc.RootElement.Clone());
+        return new ApiResponse(
+            (int)response.StatusCode,
+            "Request Successful",
+            jsonDoc.RootElement.Clone()
+        );
     }
 
     public async Task<ApiResponse> GetStockNewsAsync(string symbol)
@@ -95,7 +110,11 @@ public class ApiService(HttpClient httpClient, IConfiguration config, IMemoryCac
             );
         var jsonDoc = JsonDocument.Parse(responseStr);
         cache.Set(url, jsonDoc.RootElement.Clone(), DateTimeOffset.Now.AddHours(3));
-        return new ApiResponse((int)response.StatusCode, "Company News",jsonDoc.RootElement.Clone()); 
+        return new ApiResponse(
+            (int)response.StatusCode,
+            "Company News",
+            jsonDoc.RootElement.Clone()
+        );
     }
 
     public async Task<ApiResponse> CheckTickerAsync(string symbol)
@@ -118,10 +137,19 @@ public class ApiService(HttpClient httpClient, IConfiguration config, IMemoryCac
         var responseStr = await response.Content.ReadAsStringAsync();
         if (responseStr == "{}")
         {
-            return new ApiResponse((int)response.StatusCode,$"Ticker Symbol invalid, check input and try again", null);
+            return new ApiResponse(
+                (int)response.StatusCode,
+                $"Ticker Symbol invalid, check input and try again",
+                null
+            );
         }
         var jsonDoc = JsonDocument.Parse(responseStr);
         cache.Set(url, jsonDoc.RootElement.Clone(), DateTimeOffset.Now.AddDays(1));
-        return new ApiResponse((int)response.StatusCode, "Ticker is valid", jsonDoc.RootElement.Clone());
+        return new ApiResponse(
+            (int)response.StatusCode,
+            "Ticker is valid",
+            jsonDoc.RootElement.Clone()
+        );
     }
 }
+

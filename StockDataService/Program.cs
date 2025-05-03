@@ -12,7 +12,29 @@ builder.Services.AddSwaggerGen();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.WebHost.UseUrls("http://0.0.0.0:8080");
+
+builder.WebHost.UseKestrel(options =>
+{
+    // Http
+    options.ListenAnyIP(8080);
+    // Https
+    // var httpsCertificatePath = "~/.https-cert/https-cert.pem";
+    // var httpsCertificateKeyPath = "~/.https-cert/https-key.pem";
+    options.ListenAnyIP(
+        8081,
+        listenOptions =>
+        {
+            listenOptions.UseHttps(
+                Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    ".https-cert",
+                    "https-cert.pfx"
+                ),
+                Environment.GetEnvironmentVariable("HTTPSCERTPASSWORD")
+            );
+        }
+    );
+});
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy(
@@ -36,13 +58,12 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
-// app.UseAuthorization();
+app.UseAuthorization();
 
 app.UseCors("OpenPolicy");
 
 app.MapControllers();
 
 app.Run();
-
