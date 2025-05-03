@@ -25,11 +25,7 @@ builder.WebHost.UseKestrel(options =>
         listenOptions =>
         {
             listenOptions.UseHttps(
-                Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                    ".https-cert",
-                    "https-cert.pfx"
-                ),
+                "/https/https-cert.pfx",
                 Environment.GetEnvironmentVariable("HTTPSCERTPASSWORD")
             );
         }

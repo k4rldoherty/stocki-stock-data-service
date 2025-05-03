@@ -12,7 +12,6 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 COPY ["StockDataService/StockDataService.csproj", "StockDataService/"]
-COPY ~/.https-cert /app/.https-cert
 
 # Brings in any dependencies 
 RUN dotnet restore "StockDataService/StockDataService.csproj"
