@@ -1,6 +1,6 @@
-@StockDataService_HostAddress = http://localhost:5167
+@StockDataService_HostAddress = http://localhost:8080
 
-GET {{StockDataService_HostAddress}}/weatherforecast/
+GET {{StockDataService_HostAddress}}/
 Accept: application/json
 
 ###
