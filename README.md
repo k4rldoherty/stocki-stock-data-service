@@ -5,9 +5,8 @@
 - /api/v1/stock-info
 - /api/v1/stock-news
 - /api/v1/check-ticker
+
 - All endpoints take a ticker string as a query param and return an object of this structure 
-```
-```
 
 ```csharp 
 {
