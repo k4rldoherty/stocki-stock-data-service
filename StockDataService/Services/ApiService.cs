@@ -5,21 +5,25 @@ using StockDataService.Models;
 
 namespace StockDataService.Services;
 
-public class ApiService(HttpClient httpClient, IMemoryCache cache)
+public class ApiService(HttpClient httpClient, IMemoryCache cache, IConfiguration config)
 {
-    //private readonly string? _fhApi = config["FINNHUB_API_KEY"] ?? throw new NullReferenceException("Cannot retrieve Api Key");
-    //private readonly string? _alphaApi = config["ALPHA_API_KEY"] ?? throw new NullReferenceException("Cannot retrieve Api Key");
     private readonly string? _fhApi =
         Environment.GetEnvironmentVariable("FHAPI")
         ?? throw new NullReferenceException("Cannot retrieve fh api key");
     private readonly string? _alphaApi =
         Environment.GetEnvironmentVariable("ALPHAAPI")
         ?? throw new NullReferenceException("Cannot retrieve alpha api key");
+    private readonly string? _fhBaseUrl =
+        config["FinnhubBaseURL"]
+        ?? throw new NullReferenceException("Cannot find finnhub base url");
+    private readonly string? _alphaBaseUrl =
+        config["AlphaBaseUrl"]
+        ?? throw new NullReferenceException("Cannot find alpha vantage base url");
 
     public async Task<ApiResponse> GetStockData(string symbol)
     {
         symbol = symbol.ToUpper();
-        var url = $"https://www.finnhub.io/api/v1/quote?token={_fhApi}&symbol={symbol}";
+        var url = $"{_fhBaseUrl}quote?token={_fhApi}&symbol={symbol}";
         if (cache.TryGetValue(url, out JsonElement? cacheEntry))
         {
             return new ApiResponse(200, "Retrieved from cache", cacheEntry);
@@ -51,8 +55,7 @@ public class ApiService(HttpClient httpClient, IMemoryCache cache)
 
     public async Task<ApiResponse> GetStockInfoAsync(string symbol)
     {
-        var url =
-            $"https://www.alphavantage.co/query?function=OVERVIEW&symbol={symbol}&apikey={_alphaApi}";
+        var url = $"{_alphaBaseUrl}query?function=OVERVIEW&symbol={symbol}&apikey={_alphaApi}";
         symbol = symbol.ToUpper();
         if (cache.TryGetValue(url, out JsonElement? cacheEntry))
         {
@@ -89,7 +92,7 @@ public class ApiService(HttpClient httpClient, IMemoryCache cache)
     {
         symbol = symbol.ToUpper();
         var url =
-            $"https://www.finnhub.io/api/v1/company-news?token={_fhApi}&symbol={symbol}&from={DateTime.Now.AddDays(-7):yyyy-MM-dd}&to={DateTime.Now:yyyy-MM-dd}";
+            $"{_fhBaseUrl}company-news?token={_fhApi}&symbol={symbol}&from={DateTime.Now.AddDays(-7):yyyy-MM-dd}&to={DateTime.Now:yyyy-MM-dd}";
         if (cache.TryGetValue(url, out JsonElement? cacheEntry))
         {
             return new ApiResponse(200, "Retrieved from cache", cacheEntry);
@@ -120,7 +123,7 @@ public class ApiService(HttpClient httpClient, IMemoryCache cache)
     public async Task<ApiResponse> CheckTickerAsync(string symbol)
     {
         symbol = symbol.ToUpper();
-        var url = $"https://finnhub.io/api/v1/stock/profile2?symbol={symbol}&token={_fhApi}";
+        var url = $"{_alphaApi}stock/profile2?symbol={symbol}&token={_fhApi}";
         if (cache.TryGetValue(url, out JsonElement? cacheEntry))
         {
             return new ApiResponse(200, "Retrieved from cache", cacheEntry);
@@ -152,4 +155,3 @@ public class ApiService(HttpClient httpClient, IMemoryCache cache)
         );
     }
 }
-
