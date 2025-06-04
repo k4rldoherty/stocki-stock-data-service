@@ -8,4 +8,3 @@ public class ApiResponse(int statusCode, string message, JsonElement? data)
     public string Message { get; } = message;
     public JsonElement? Data { get; } = data;
 }
-

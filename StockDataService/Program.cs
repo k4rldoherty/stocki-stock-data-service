@@ -13,23 +13,6 @@ builder.Services.AddSwaggerGen();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.WebHost.UseKestrel(options =>
-{
-    // Http
-    options.ListenAnyIP(8080);
-
-    // Https - Not really needed for an internal microservice
-    // options.ListenAnyIP(
-    //     8081,
-    //     listenOptions =>
-    //     {
-    //         listenOptions.UseHttps(
-    //             "/https/https-cert.pfx",
-    //             Environment.GetEnvironmentVariable("HTTPSCERTPASSWORD")
-    //         );
-    //     }
-    // );
-});
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy(

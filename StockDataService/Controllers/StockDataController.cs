@@ -4,42 +4,37 @@ using StockDataService.Services;
 namespace StockDataService.Controllers;
 
 [ApiController]
-[Route("api/")]
+[Route("api/v1/")]
 public class StockDataController(ApiService apiService) : ControllerBase
 {
-    [HttpGet("get-stock-price-data/{ticker}")]
-    public async Task<IActionResult> GetStockPriceDataAsync(string ticker)
+    [HttpGet("stock-price-data")]
+    public async Task<IActionResult> GetStockPriceDataAsync(
+        [FromQuery(Name = "ticker")] string ticker
+    )
     {
-        var res = await apiService.GetStockData(ticker);
-        return res.Data is null
-            ? StatusCode((int)res.StatusCode, res.Message)
-            : Ok(res);
+        var res = await apiService.GetStockPriceData(ticker);
+        return res.Data is null ? StatusCode((int)res.StatusCode, res.Message) : Ok(res);
     }
 
-    [HttpGet("get-stock-info/{ticker}")]
-    public async Task<IActionResult> GetStockInfoAsync(string ticker)
+    [HttpGet("stock-overview")]
+    public async Task<IActionResult> GetStockInfoAsync([FromQuery(Name = "ticker")] string ticker)
     {
         var res = await apiService.GetStockInfoAsync(ticker);
-        return res.Data is null
-            ? StatusCode((int)res.StatusCode, res.Message)
-            : Ok(res);
+        return res.Data is null ? StatusCode((int)res.StatusCode, res.Message) : Ok(res);
     }
 
-    [HttpGet("get-stock-news/{ticker}")]
-    public async Task<IActionResult> GetStockNewsAsync(string ticker)
+    [HttpGet("stock-news")]
+    public async Task<IActionResult> GetStockNewsAsync([FromQuery(Name = "ticker")] string ticker)
     {
         var res = await apiService.GetStockNewsAsync(ticker);
-        return res.Data is null
-            ? StatusCode((int)res.StatusCode, res.Message)
-            : Ok(res);
+        return res.Data is null ? StatusCode((int)res.StatusCode, res.Message) : Ok(res);
     }
 
-    [HttpGet("check-ticker/{ticker}")]
-    public async Task<IActionResult> CheckTickerAsync(string ticker)
+    [HttpGet("check-ticker")]
+    public async Task<IActionResult> CheckTickerAsync([FromQuery(Name = "ticker")] string ticker)
     {
         var res = await apiService.CheckTickerAsync(ticker);
-        return res.Data is null
-            ? StatusCode((int)res.StatusCode, res.Message)
-            : Ok(res);
+        return res.Data is null ? StatusCode((int)res.StatusCode, res.Message) : Ok(res);
     }
 }
+

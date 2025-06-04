@@ -20,7 +20,7 @@ public class ApiService(HttpClient httpClient, IMemoryCache cache, IConfiguratio
         config["AlphaBaseUrl"]
         ?? throw new NullReferenceException("Cannot find alpha vantage base url");
 
-    public async Task<ApiResponse> GetStockData(string symbol)
+    public async Task<ApiResponse> GetStockPriceData(string symbol)
     {
         symbol = symbol.ToUpper();
         var url = $"{_fhBaseUrl}quote?token={_fhApi}&symbol={symbol}";
@@ -48,7 +48,7 @@ public class ApiService(HttpClient httpClient, IMemoryCache cache, IConfiguratio
         cache.Set(url, jsonDoc.RootElement.Clone(), DateTimeOffset.Now.AddMinutes(5));
         return new ApiResponse(
             ((int)response.StatusCode),
-            $"{DateTime.Now}",
+            $"Stock Data for {symbol} retrieved",
             jsonDoc.RootElement.Clone()
         );
     }
@@ -123,7 +123,7 @@ public class ApiService(HttpClient httpClient, IMemoryCache cache, IConfiguratio
     public async Task<ApiResponse> CheckTickerAsync(string symbol)
     {
         symbol = symbol.ToUpper();
-        var url = $"{_alphaApi}stock/profile2?symbol={symbol}&token={_fhApi}";
+        var url = $"{_fhBaseUrl}stock/profile2?symbol={symbol}&token={_fhApi}";
         if (cache.TryGetValue(url, out JsonElement? cacheEntry))
         {
             return new ApiResponse(200, "Retrieved from cache", cacheEntry);
